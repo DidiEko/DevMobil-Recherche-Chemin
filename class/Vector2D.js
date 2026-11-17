@@ -54,4 +54,11 @@ export default class Vector2D {
     this.y = Math.sin(angle) * length;
     return this;
   }
+
+  lerp(other, progress) {
+    this.x += (other.x - this.x) * progress;
+    this.y += (other.y - this.y) * progress;
+
+    return this;
+  }
 }

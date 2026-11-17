@@ -1,6 +1,8 @@
 import Circle from './class/Circle.js';
 import Vector2D from './class/Vector2D.js';
 import AutomatonWithPathfinding from './class/AutomatonWithPathfinding.js';
+import Tweens from './class/Tweens.js';
+import PathFollower from './class/PathFollower.js';
 
 const canvas = document.querySelector('#stage');
 const ctx = canvas.getContext('2d');
@@ -11,23 +13,14 @@ const stage = new AutomatonWithPathfinding({
   cols: 30,
 });
 
+const tweens = new Tweens();
+
 let freeCells = [];
 
 do {
   stage.generate(0.65, 8);
   freeCells = stage.getFreeCells();
 } while (freeCells.length === 0);
-
-// TEST : deux zones libres séparées par un mur vertical.
-// const wallCol = Math.floor(stage.cols / 2);
-
-// for (let row = 0; row < stage.rows; row++) {
-//   for (let col = 0; col < stage.cols; col++) {
-//     stage.grid[row][col] = col === wallCol ? 0 : 1;
-//   }
-// } 
-
-freeCells = stage.getFreeCells();
 
 const startingCell = freeCells[
   Math.floor(Math.random() * freeCells.length)
@@ -39,10 +32,26 @@ const circle = new Circle({
   color: '#f97316',
 });
 
+const follower = new PathFollower({
+  circle,
+  stage,
+  tweens,
+  cell: startingCell,
+  speed: 0.15,
+});
+
 let destination = null;
 let destinationReachable = false;
 
+follower.onArrival = () => {
+  status.textContent = 'Arrivé ! Choisissez une nouvelle destination.';
+  resizeCanvas();
+};
+
 function resizeCanvas() {
+  // Le redimensionnement du dessin attend la fin du trajet.
+  if (follower.isMoving) return;
+
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
 
@@ -52,7 +61,7 @@ function resizeCanvas() {
   );
 
   circle.position = new Vector2D(
-    stage.cellToPosition(startingCell),
+    stage.cellToPosition(follower.cell),
   );
   circle.radius = stage.cellSize * 0.3;
 
@@ -86,7 +95,7 @@ function draw() {
 }
 
 function onPointerDown(event) {
-  if (event.button !== 0) return;
+  if (event.button !== 0 || follower.isMoving) return;
 
   const bounds = canvas.getBoundingClientRect();
 
@@ -103,23 +112,43 @@ function onPointerDown(event) {
   stage.flowFieldTo(cell.row, cell.col);
 
   destinationReachable =
-    stage.flowMap[startingCell.row][startingCell.col] !== null;
+    stage.flowMap[follower.cell.row][follower.cell.col] !== null;
 
-  if (
-    cell.row === startingCell.row &&
-    cell.col === startingCell.col
-  ) {
-    status.textContent = 'Le cercle est déjà à destination.';
-  } else if (destinationReachable) {
-    status.textContent = 'Un chemin existe vers cette destination.';
-  } else {
+  if (!destinationReachable) {
     status.textContent = 'Cette destination est inaccessible.';
+    return;
   }
 
-  draw();
+  if (
+    cell.row === follower.cell.row &&
+    cell.col === follower.cell.col
+  ) {
+    status.textContent = 'Le cercle est déjà à destination.';
+    return;
+  }
+
+  status.textContent = 'Déplacement en cours…';
+  follower.start();
 }
 
 canvas.addEventListener('pointerdown', onPointerDown);
 window.addEventListener('resize', resizeCanvas);
 
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    window.MainLoop.stop();
+  } else {
+    window.MainLoop.resetFrameDelta();
+    window.MainLoop.start();
+  }
+});
+
 resizeCanvas();
+
+window.MainLoop
+  .setUpdate(dt => tweens.update(dt))
+  .setDraw(draw)
+  .setEnd((fps, panic) => {
+    if (panic) window.MainLoop.resetFrameDelta();
+  })
+  .start();
