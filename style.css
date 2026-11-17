@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+}
+
+canvas {
+  display: block;
+  width: 100dvw;
+  height: 100dvh;
+  background-color: #18212f;
+  touch-action: none;
+  /*touch-action: none permettra d’utiliser les interactions tactiles sur le terrain sans déclencher le défilement de la page.*/
+}
