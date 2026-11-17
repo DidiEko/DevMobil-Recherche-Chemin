@@ -24,3 +24,25 @@ canvas {
   font-family: sans-serif;
   pointer-events: none;
 }
+
+#new-terrain {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f97316;
+  color: #18212f;
+  font: 600 16px sans-serif;
+  cursor: pointer;
+}
+
+#new-terrain:hover {
+  background-color: #fb923c;
+}
+
+#new-terrain:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
