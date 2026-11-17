@@ -3,9 +3,9 @@ import Vector2D from './class/Vector2D.js';
 import AutomatonWithPathfinding from './class/AutomatonWithPathfinding.js';
 import Tweens from './class/Tweens.js';
 import PathFollower from './class/PathFollower.js';
+import SceneRenderer from './class/SceneRenderer.js';
 
 const canvas = document.querySelector('#stage');
-const ctx = canvas.getContext('2d');
 const status = document.querySelector('#status');
 const newTerrainButton = document.querySelector('#new-terrain');
 
@@ -35,6 +35,12 @@ const circle = new Circle({
     position: new Vector2D(stage.cellToPosition(startingCell)),
     radius: stage.cellSize * 0.3,
     color: '#f97316',
+});
+
+const renderer = new SceneRenderer({
+    canvas,
+    stage,
+    circle,
 });
 
 const follower = new PathFollower({
@@ -74,30 +80,8 @@ function resizeCanvas() {
     draw();
 }
 
-function drawDestination() {
-    if (destination === null) return;
-
-    const position = stage.cellToPosition(destination);
-
-    ctx.beginPath();
-    ctx.arc(
-        position.x,
-        position.y,
-        stage.cellSize * 0.4,
-        0,
-        Math.PI * 2,
-    );
-    ctx.strokeStyle = destinationReachable ? '#15803d' : '#dc2626';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-}
-
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    stage.draw(ctx);
-    drawDestination();
-    circle.draw(ctx);
+  renderer.draw(destination, destinationReachable);
 }
 
 function onPointerDown(event) {
