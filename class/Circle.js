@@ -1,9 +1,5 @@
 export default class Circle {
-  constructor({const circle = new Circle({
-  position: new Vector2D({ x: 0, y: 0 }),
-  radius: 25,
-  color: '#ffb86b',
-});}) {
+  constructor({ position, radius = 15, color = '#75e0b0' }) {
     this.position = position;
     this.radius = radius;
     this.color = color;
