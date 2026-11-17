@@ -109,8 +109,6 @@ export default class Automaton {
                 ctx.fillStyle = this.grid[row][col] === 1
                     ? this.freeColor
                     : this.wallColor;
-                this.birthRules = new Set([6, 7, 8]);
-                this.survivalRules = new Set([3, 4, 5, 6, 7, 8]);
 
                 ctx.fillRect(
                     col * this.cellSize,

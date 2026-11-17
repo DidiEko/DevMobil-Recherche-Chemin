@@ -67,7 +67,9 @@ export default class Tweens {
   }
 
   update(dt) {
-    for (const tween of this.tweens) {
+    for (const tween of [...this.tweens]) {
+      if (!this.tweens.has(tween)) continue;
+
       tween.time += dt;
 
       const t = Math.min(tween.time / tween.dur, 1);
