@@ -82,34 +82,34 @@ function resizeCanvas() {
 }
 
 function draw() {
-  renderer.draw(destination, destinationReachable);
+    renderer.draw(destination, destinationReachable);
 }
 
 function selectDestination(cell) {
-  if (follower.isMoving) return;
+    if (follower.isMoving) return;
 
-  destination = cell;
-  stage.flowFieldTo(cell.row, cell.col);
+    destination = cell;
+    stage.flowFieldTo(cell.row, cell.col);
 
-  destinationReachable =
-    stage.flowMap[follower.cell.row][follower.cell.col] !== null;
+    destinationReachable =
+        stage.flowMap[follower.cell.row][follower.cell.col] !== null;
 
-  if (!destinationReachable) {
-    status.textContent = 'Cette destination est inaccessible.';
-    return;
-  }
+    if (!destinationReachable) {
+        status.textContent = 'Cette destination est inaccessible.';
+        return;
+    }
 
-  if (
-    cell.row === follower.cell.row &&
-    cell.col === follower.cell.col
-  ) {
-    status.textContent = 'Le cercle est déjà à destination.';
-    return;
-  }
+    if (
+        cell.row === follower.cell.row &&
+        cell.col === follower.cell.col
+    ) {
+        status.textContent = 'Le cercle est déjà à destination.';
+        return;
+    }
 
-  status.textContent = 'Déplacement en cours…';
-  newTerrainButton.disabled = true;
-  follower.start();
+    status.textContent = 'Déplacement en cours…';
+    newTerrainButton.disabled = true;
+    follower.start();
 }
 
 function resetTerrain() {
@@ -129,12 +129,16 @@ function resetTerrain() {
 newTerrainButton.addEventListener('click', resetTerrain);
 
 new PointerController({
-  canvas,
-  stage,
-  onSelect: selectDestination,
+    canvas,
+    stage,
+    onSelect: selectDestination,
 });
 
-window.addEventListener('resize', resizeCanvas);
+const canvasResizeObserver = new ResizeObserver(() => {
+    resizeCanvas();
+});
+
+canvasResizeObserver.observe(canvas);
 
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {

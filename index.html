@@ -6,10 +6,23 @@
     <title>DevMobil — Recherche de chemin</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
+
   <body>
-    <canvas id="stage"></canvas>
-    <p id="status" role="status">Choisissez une case libre.</p>
-    <button id="new-terrain" type="button">Nouveau terrain</button>
+    <header class="toolbar">
+      <h1>Recherche de chemin</h1>
+      <button id="new-terrain" type="button">
+        Nouveau terrain
+      </button>
+    </header>
+
+    <main>
+      <canvas id="stage"></canvas>
+    </main>
+
+    <footer>
+      <p id="status" role="status">Choisissez une case libre.</p>
+    </footer>
+
     <script src="./lib/mainloop.min.js"></script>
     <script type="module" src="./index.js"></script>
   </body>
