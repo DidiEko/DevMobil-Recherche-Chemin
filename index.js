@@ -13,7 +13,7 @@ const stage = new Automaton({
 let freeCells = [];
 
 do {
-  stage.randomize(0.55);
+  stage.randomize(0.65, 8);
   freeCells = stage.getFreeCells();
 } while (freeCells.length === 0);
 
