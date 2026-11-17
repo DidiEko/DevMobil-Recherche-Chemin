@@ -4,6 +4,7 @@ import AutomatonWithPathfinding from './class/AutomatonWithPathfinding.js';
 import Tweens from './class/Tweens.js';
 import PathFollower from './class/PathFollower.js';
 import SceneRenderer from './class/SceneRenderer.js';
+import PointerController from './class/PointerController.js';
 
 const canvas = document.querySelector('#stage');
 const status = document.querySelector('#status');
@@ -84,42 +85,31 @@ function draw() {
   renderer.draw(destination, destinationReachable);
 }
 
-function onPointerDown(event) {
-    if (event.button !== 0 || follower.isMoving) return;
+function selectDestination(cell) {
+  if (follower.isMoving) return;
 
-    const bounds = canvas.getBoundingClientRect();
+  destination = cell;
+  stage.flowFieldTo(cell.row, cell.col);
 
-    const position = {
-        x: (event.clientX - bounds.left) * canvas.width / bounds.width,
-        y: (event.clientY - bounds.top) * canvas.height / bounds.height,
-    };
+  destinationReachable =
+    stage.flowMap[follower.cell.row][follower.cell.col] !== null;
 
-    const cell = stage.positionToCell(position);
+  if (!destinationReachable) {
+    status.textContent = 'Cette destination est inaccessible.';
+    return;
+  }
 
-    if (!stage.isWalkable(cell.row, cell.col)) return;
+  if (
+    cell.row === follower.cell.row &&
+    cell.col === follower.cell.col
+  ) {
+    status.textContent = 'Le cercle est déjà à destination.';
+    return;
+  }
 
-    destination = cell;
-    stage.flowFieldTo(cell.row, cell.col);
-
-    destinationReachable =
-        stage.flowMap[follower.cell.row][follower.cell.col] !== null;
-
-    if (!destinationReachable) {
-        status.textContent = 'Cette destination est inaccessible.';
-        return;
-    }
-
-    if (
-        cell.row === follower.cell.row &&
-        cell.col === follower.cell.col
-    ) {
-        status.textContent = 'Le cercle est déjà à destination.';
-        return;
-    }
-
-    status.textContent = 'Déplacement en cours…';
-    newTerrainButton.disabled = true;
-    follower.start();
+  status.textContent = 'Déplacement en cours…';
+  newTerrainButton.disabled = true;
+  follower.start();
 }
 
 function resetTerrain() {
@@ -138,7 +128,12 @@ function resetTerrain() {
 
 newTerrainButton.addEventListener('click', resetTerrain);
 
-canvas.addEventListener('pointerdown', onPointerDown);
+new PointerController({
+  canvas,
+  stage,
+  onSelect: selectDestination,
+});
+
 window.addEventListener('resize', resizeCanvas);
 
 document.addEventListener('visibilitychange', () => {
